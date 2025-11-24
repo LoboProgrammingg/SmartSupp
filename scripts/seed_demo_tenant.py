@@ -33,6 +33,10 @@ class DemoTenantSeeder(BaseSeeder):
             name="Loja Demo - Academia Fit",
             defaults={"plan": TenantPlan.PRO}
         )
+        # Garantir que tenant foi commitado e tem ID
+        if tenant_created:
+            self.session.commit()
+        self.session.refresh(tenant)
         print(f"{'✅ Criado' if tenant_created else '⚠️  Já existe'} tenant: {tenant.name} (ID: {tenant.id})")
 
         # Produtos reais de marcas concorrentes - Whey Protein
