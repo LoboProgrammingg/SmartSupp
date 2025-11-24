@@ -26,5 +26,5 @@ ENV PYTHONDONTWRITEBYTECODE=1
 EXPOSE 8003
 
 # Comando para iniciar a aplicação
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8003", "--reload"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8003", "--reload", "--log-level", "info"]
 
