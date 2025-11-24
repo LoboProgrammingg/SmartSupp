@@ -6,16 +6,20 @@ WORKDIR /app
 RUN pip install poetry==2.1.3 && \
     poetry config virtualenvs.create false
 
-# Copiar arquivos de dependências
-COPY pyproject.toml poetry.lock* ./
+# Copiar arquivos de dependências e README (necessário para poetry install)
+COPY pyproject.toml poetry.lock* README.md ./
 
-# Instalar dependências
+# Instalar dependências (sem instalar o projeto ainda)
 RUN poetry install --no-interaction --no-ansi --no-root
 
 # Copiar código da aplicação
-COPY . .
+COPY src/ ./src/
+COPY scripts/ ./scripts/
+COPY alembic/ ./alembic/
+COPY alembic.ini ./
+COPY init.sql ./
 
-# Instalar a aplicação
+# Instalar o projeto agora que temos tudo (incluindo README.md)
 RUN poetry install --no-interaction --no-ansi
 
 # Variáveis de ambiente padrão

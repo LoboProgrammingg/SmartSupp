@@ -40,9 +40,9 @@ logs/
 *.log
 .git/
 .gitignore
-README.md
 docs/
 *.md
+!README.md
 Dockerfile
 .dockerignore
 docker-compose.yml
