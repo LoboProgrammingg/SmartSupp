@@ -7,19 +7,21 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
 from src.agents.state import AgentState
+from src.agents.utils import get_session_from_config
 from src.domain.models import UserProfile
 from src.domain.enums import UserGoal, BudgetRange, DietaryRestriction, MedicalCondition
 
 
-async def anamnesis_collector(state: AgentState, session: AsyncSession) -> AgentState:
+async def anamnesis_collector(state: AgentState, config: dict[str, Any] | None = None) -> AgentState:
     """
     Node: Anamnesis Collector
     Garante que todos os dados de anamnese estão coletados
     """
     errors = state.get("errors", [])
+    session = get_session_from_config(config)
 
     # Se já existe user_profile_id, buscar perfil existente
-    if state.get("user_profile_id"):
+    if state.get("user_profile_id") and session:
         stmt = select(UserProfile).where(UserProfile.id == state["user_profile_id"])
         profile = (await session.exec(stmt)).first()
 

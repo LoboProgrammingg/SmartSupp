@@ -7,11 +7,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
 from src.agents.state import AgentState
+from src.agents.utils import get_session_from_config
 from src.domain.models import Product
 from src.domain.enums import SupplementCategory, DietaryRestriction, MedicalCondition
 
 
-async def comparative_analysis(state: AgentState, session: AsyncSession) -> AgentState:
+async def comparative_analysis(state: AgentState, config: dict[str, Any] | None = None) -> AgentState:
     """
     Node: Comparative Analysis (Matchmaking)
     Filtra e ranqueia produtos baseado em:
@@ -25,9 +26,15 @@ async def comparative_analysis(state: AgentState, session: AsyncSession) -> Agen
     dietary_restrictions = state.get("dietary_restrictions", [])
     medical_conditions = state.get("medical_conditions", [])
     budget_range = state.get("budget_range")
+    session = get_session_from_config(config)
 
     if not tenant_id or not category:
         state["errors"] = state.get("errors", []) + ["Tenant ou categoria não definidos"]
+        state["step"] = "comparative_analysis_failed"
+        return state
+
+    if not session:
+        state["errors"] = state.get("errors", []) + ["Sessão de banco não disponível"]
         state["step"] = "comparative_analysis_failed"
         return state
 

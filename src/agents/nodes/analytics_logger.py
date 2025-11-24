@@ -8,10 +8,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from uuid import uuid4
 
 from src.agents.state import AgentState
+from src.agents.utils import get_session_from_config
 from src.domain.models import InteractionLog
 
 
-async def analytics_logger(state: AgentState, session: AsyncSession) -> AgentState:
+async def analytics_logger(state: AgentState, config: dict[str, Any] | None = None) -> AgentState:
     """
     Node: Analytics Logger
     Salva log de interação para BI
@@ -23,9 +24,15 @@ async def analytics_logger(state: AgentState, session: AsyncSession) -> AgentSta
     recommended_product_ids = state.get("recommended_product_ids", [])
     ranking_data = state.get("ranking_data", {})
     response = state.get("response")
+    session = get_session_from_config(config)
 
     if not tenant_id:
         state["errors"] = state.get("errors", []) + ["Tenant não definido para logging"]
+        state["step"] = "analytics_logging_failed"
+        return state
+
+    if not session:
+        state["errors"] = state.get("errors", []) + ["Sessão de banco não disponível para logging"]
         state["step"] = "analytics_logging_failed"
         return state
 

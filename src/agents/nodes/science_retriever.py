@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
 from src.agents.state import AgentState
+from src.agents.utils import get_session_from_config
 from src.domain.models import ScientificData
 from src.domain.enums import EvidenceLevel, SupplementCategory, UserGoal
 
@@ -22,14 +23,21 @@ GOAL_TO_CATEGORY: dict[str, SupplementCategory] = {
 }
 
 
-async def science_retriever(state: AgentState, session: AsyncSession) -> AgentState:
+async def science_retriever(state: AgentState, config: dict[str, Any] | None = None) -> AgentState:
     """
     Node: Science Retriever
     Consulta base científica (AIS/Examine) baseado no objetivo
     """
     goal = state.get("goal")
+    session = get_session_from_config(config)
+
     if not goal:
         state["errors"] = state.get("errors", []) + ["Goal não definido"]
+        state["step"] = "science_retrieval_failed"
+        return state
+
+    if not session:
+        state["errors"] = state.get("errors", []) + ["Sessão de banco não disponível"]
         state["step"] = "science_retrieval_failed"
         return state
 
