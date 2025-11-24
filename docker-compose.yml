@@ -20,6 +20,54 @@ services:
       retries: 5
     networks:
       - smartsupp_network
+    restart: unless-stopped
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smartsupp_app
+    ports:
+      - "${APP_PORT:-8003}:8003"
+    environment:
+      # Database
+      POSTGRES_USER: ${POSTGRES_USER:-smartsupp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartsupp_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-smartsupp}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      # App
+      APP_NAME: ${APP_NAME:-SmartSupp}
+      DEBUG: ${DEBUG:-True}
+      TESTING: ${TESTING:-False}
+      VERSION: ${VERSION:-0.1.0}
+      # Security
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      ALGORITHM: ${ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      # LLM
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GOOGLE_CLOUD_PROJECT: ${GOOGLE_CLOUD_PROJECT:-}
+      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS:-}
+      VERTEX_AI_LOCATION: ${VERTEX_AI_LOCATION:-us-central1}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.0-flash-exp}
+      # Python
+      PYTHONUNBUFFERED: 1
+      PYTHONDONTWRITEBYTECODE: 1
+    volumes:
+      - ./src:/app/src:ro  # Mount apenas src para hot reload
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - smartsupp_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   postgres_data:
