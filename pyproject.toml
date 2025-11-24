@@ -33,6 +33,9 @@ mypy = "^1.11.0"
 
 [tool.poetry.scripts]
 dev = "uvicorn src.main:app --reload --host 0.0.0.0 --port 8000"
+seed-science = "python scripts/seed_science.py"
+seed-demo = "python scripts/seed_demo_tenant.py"
+seed-all = "python scripts/seed_all.py"
 
 [build-system]
 requires = ["poetry-core"]
@@ -55,4 +58,3 @@ disallow_untyped_defs = true
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
-
