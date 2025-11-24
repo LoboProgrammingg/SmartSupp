@@ -6,8 +6,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.core.config import settings
-from src.core.database import init_db
+from src.core.database import init_db, TenantScope
 from src.core.security import TenantMiddleware
+from src.api.routes import chat, user_profile, analytics
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -26,8 +27,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# TODO: Adicionar TenantMiddleware quando implementado
-# app.middleware("http")(TenantMiddleware.extract_tenant_from_header)
+# Middleware para limpar escopo de tenant após requisição
+@app.middleware("http")
+async def tenant_middleware(request, call_next):
+    response = await call_next(request)
+    TenantScope.clear_tenant()
+    return response
+
+# Registrar rotas
+app.include_router(chat.router)
+app.include_router(user_profile.router)
+app.include_router(analytics.router)
 
 
 @app.on_event("startup")
