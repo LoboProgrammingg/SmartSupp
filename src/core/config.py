@@ -46,6 +46,7 @@ class Settings(BaseSettings):
     # LLM (Google Gemini 2.5 Flash)
     GOOGLE_CLOUD_PROJECT: str | None = None
     GOOGLE_APPLICATION_CREDENTIALS: str | None = None
+    GOOGLE_API_KEY: str | None = None  # Para Google AI Studio (dev/test)
     VERTEX_AI_LOCATION: str = "us-central1"
     GEMINI_MODEL: str = "gemini-2.0-flash-exp"
 
