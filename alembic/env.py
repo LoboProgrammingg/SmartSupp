@@ -28,8 +28,7 @@ if config.config_file_name is not None:
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL_SYNC)
 
 # Importa todos os models para que o Alembic os detecte
-# TODO: Quando criar os models na Etapa 2, importá-los aqui
-# from src.domain.models import Tenant, UserProfile, Product, ...
+from src.domain.models import Tenant, ScientificData, UserProfile, Product, InteractionLog  # noqa: F401
 
 # target_metadata é usado pela autogenerate
 target_metadata = SQLModel.metadata
