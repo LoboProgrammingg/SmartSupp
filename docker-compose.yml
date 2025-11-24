@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: smartsupp_db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-smartsupp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartsupp_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-smartsupp}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-smartsupp}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smartsupp_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  smartsupp_network:
+    driver: bridge
+
