@@ -36,6 +36,7 @@ mypy = "^1.11.0"
 
 [tool.poetry.scripts]
 dev = "scripts.dev:main"
+dev-bg = "scripts.dev_background:main"
 seed-science = "scripts.seed_science:main"
 seed-demo = "scripts.seed_demo_tenant:main"
 seed-all = "scripts.seed_all:main"
